@@ -29,6 +29,8 @@ public:
         NoError = 0,
         UnknownError = 2,
         SerialisationError = 3,
+        DaemonError = 5,
+        DiscoveryError = 6,
 
         PermissionsError = 10,
         IncorrectAuthenticationKeyError,

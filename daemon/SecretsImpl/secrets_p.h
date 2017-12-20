@@ -36,6 +36,10 @@ class SecretsDBusObject : public QObject, protected QDBusContext
     Q_CLASSINFO("D-Bus Interface", "org.sailfishos.secrets")
     Q_CLASSINFO("D-Bus Introspection", ""
     "  <interface name=\"org.sailfishos.secrets\">\n"
+    "      <method name=\"ping\">\n"
+    "          <arg name=\"userInteractionMode\" type=\"(i)\" direction=\"in\" />\n"
+    "          <annotation name=\"org.qtproject.QtDBus.QtTypeName.In0\" value=\"Sailfish::Secrets::SecretManager::AccessControlMode\" />\n"
+    "      </method>"
     "      <method name=\"getPluginInfo\">\n"
     "          <arg name=\"result\" type=\"(iis)\" direction=\"out\" />\n"
     "          <arg name=\"storagePlugins\" type=\"(si)\" direction=\"out\" />\n"
@@ -163,6 +167,10 @@ public:
     SecretsDBusObject(Sailfish::Secrets::Daemon::ApiImpl::SecretsRequestQueue *parent);
 
 public Q_SLOTS:
+    void ping(Sailfish::Secrets::SecretManager::UserInteractionMode userInteractionMode) {
+        qWarning() << "XXXXXXXXXXXX received ping:" << userInteractionMode;
+    }
+
     // retrieve information about available plugins
     void getPluginInfo(
             const QDBusMessage &message,

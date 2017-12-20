@@ -94,6 +94,38 @@ Requires:   libsailfishcrypto = %{version}-%{release}
 %description -n libsailfishcrypto-tests
 %{summary}.
 
+
+%package -n libsailfishsecretscrypto
+Summary:    Sailfish OS Secrets And Crypto C API library
+Group:      System/Libraries
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gio-unix-2.0)
+
+%description -n libsailfishsecretscrypto
+%{summary}.
+
+
+%package -n libsailfishsecretscrypto-devel
+Summary:    Development package for Sailfish OS Secrets And Crypto C API library
+Group:      System/Libraries
+Requires:   libsailfishsecretscrypto = %{version}-%{release}
+
+%description -n libsailfishsecretscrypto-devel
+%{summary}.
+
+
+%package -n libsailfishsecretscrypto-tests
+Summary:    Unit tests for the libsailfishsecretscrypto library.
+Group:      System/Libraries
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
+Requires:   libsailfishsecretscrypto = %{version}-%{release}
+
+%description -n libsailfishsecretscrypto-tests
+%{summary}.
+
+
 %package -n sailfishcryptodaemonplugins
 Summary:    Sailfish OS crypto daemon (example) plugins.
 Group:      Applications/System
@@ -138,6 +170,10 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishcrypto.so.*
 
+%files -n libsailfishsecretscrypto
+%defattr(-,root,root,-)
+%{_libdir}/libsailfishsecretscrypto.so.*
+
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/libsailfishsecrets.so
@@ -149,6 +185,12 @@ rm -rf %{buildroot}
 %{_libdir}/libsailfishcrypto.so
 %{_libdir}/pkgconfig/sailfishcrypto.pc
 %{_includedir}/libsailfishcrypto/*
+
+%files -n libsailfishsecretscrypto-devel
+%defattr(-,root,root,-)
+%{_libdir}/libsailfishsecretscrypto.so
+%{_libdir}/pkgconfig/sailfishsecretscrypto.pc
+%{_includedir}/libsailfishsecretscrypto/*
 
 %files -n libsailfishsecretsplugin
 %defattr(-,root,root,-)
@@ -186,6 +228,10 @@ rm -rf %{buildroot}
 /opt/tests/Sailfish/Crypto/tst_cryptostorage
 %{_libdir}/sailfish/crypto/libsailfishcrypto-testopenssl.so
 
+%files -n libsailfishsecretscrypto-tests
+%defattr(-,root,root,-)
+/opt/tests/Sailfish/SecretsCrypto/tst_secretscrypto
+
 %files -n qt5-plugin-sqldriver-sqlcipher
 %defattr(-,root,root,-)
 %{_libdir}/qt5/plugins/sqldrivers/libqsqlcipher.so
@@ -200,6 +246,12 @@ rm -rf %{buildroot}
 /sbin/ldconfig
 
 %postun -n libsailfishcrypto
+/sbin/ldconfig
+
+%post -n libsailfishsecretscrypto
+/sbin/ldconfig
+
+%postun -n libsailfishsecretscrypto
 /sbin/ldconfig
 
 %post -n libsailfishsecretsplugin
