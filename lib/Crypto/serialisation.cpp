@@ -475,19 +475,73 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, Certificate &cert
 
 QDBusArgument &operator<<(QDBusArgument &argument, const Key &key)
 {
+    //((ss)iiiiiiiayayayiiaay(a{sv}))
     argument.beginStructure();
-    argument << Key::serialise(key);
+    argument << key.identifier();
+    argument << static_cast<int>(key.origin());
+    argument << static_cast<int>(key.algorithm());
+    argument << static_cast<int>(key.operations());
+    argument << static_cast<int>(key.blockModes());
+    argument << static_cast<int>(key.encryptionPaddings());
+    argument << static_cast<int>(key.signaturePaddings());
+    argument << static_cast<int>(key.digests());
+    argument << key.publicKey();
+    argument << key.privateKey();
+    argument << key.secretKey();
+    argument << static_cast<int>(key.validityStart().toTime_t());
+    argument << static_cast<int>(key.validityEnd().toTime_t());
+    argument << key.customParameters();
+    argument << key.filterData();
     argument.endStructure();
     return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, Key &key)
 {
-    QByteArray keydata;
+    Key::Identifier identifier;
+    int origin = 0;
+    int algorithm = 0;
+    int operations = 0;
+    int blockModes = 0;
+    int encryptionPaddings = 0;
+    int signaturePaddings = 0;
+    int digests = 0;
+    QByteArray publicKey;
+    QByteArray privateKey;
+    QByteArray secretKey;
+    int validityStart = 0;
+    int validityEnd = 0;
+    QVector<QByteArray> customParameters;
+    Key::FilterData filterData;
+
     argument.beginStructure();
-    argument >> keydata;
+    argument >> identifier
+             >> origin >> algorithm
+             >> operations >> blockModes
+             >> encryptionPaddings >> signaturePaddings
+             >> digests
+             >> publicKey >> privateKey >> secretKey
+             >> validityStart >> validityEnd
+             >> customParameters
+             >> filterData;
     argument.endStructure();
-    key = Key::deserialise(keydata);
+
+    key.setIdentifier(identifier);
+    key.setOrigin(static_cast<Sailfish::Crypto::Key::Origin>(origin));
+    key.setAlgorithm(static_cast<Sailfish::Crypto::Key::Algorithm>(algorithm));
+    key.setOperations(static_cast<Sailfish::Crypto::Key::Operations>(operations));
+    key.setBlockModes(static_cast<Sailfish::Crypto::Key::BlockModes>(blockModes));
+    key.setEncryptionPaddings(static_cast<Sailfish::Crypto::Key::EncryptionPaddings>(encryptionPaddings));
+    key.setSignaturePaddings(static_cast<Sailfish::Crypto::Key::SignaturePaddings>(signaturePaddings));
+    key.setDigests(static_cast<Sailfish::Crypto::Key::Digests>(digests));
+    key.setPublicKey(publicKey);
+    key.setPrivateKey(privateKey);
+    key.setSecretKey(secretKey);
+    key.setValidityStart(QDateTime::fromTime_t(static_cast<time_t>(validityStart)));
+    key.setValidityEnd(QDateTime::fromTime_t(static_cast<time_t>(validityEnd)));
+    key.setCustomParameters(customParameters);
+    key.setFilterData(filterData);
+
     return argument;
 }
 
@@ -513,19 +567,31 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, Key::Identifier &
 
 QDBusArgument &operator<<(QDBusArgument &argument, const Key::FilterData &filterData)
 {
+    QVariantMap asv;
+    const QMap<QString,QString> fd = filterData;
+    for (QMap<QString,QString>::const_iterator it = fd.constBegin(); it != fd.constEnd(); it++) {
+        asv.insert(it.key(), it.value());
+    }
+
     argument.beginStructure();
-    argument << filterData;
+    argument << asv;
     argument.endStructure();
     return argument;
 }
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, Key::FilterData &filterData)
 {
-    QMap<QString,QString> data;
+    QVariantMap asv;
     argument.beginStructure();
-    argument >> data;
+    argument >> asv;
     argument.endStructure();
-    filterData = Key::FilterData(data);
+
+    QMap<QString, QString> fd;
+    for (QVariantMap::const_iterator it = asv.constBegin(); it != asv.constEnd(); it++) {
+        fd.insert(it.key(), it.value().toString());
+    }
+
+    filterData = Key::FilterData(fd);
     return argument;
 }
 
